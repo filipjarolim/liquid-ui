@@ -234,8 +234,10 @@ void main() {
 	// curvature break that reads as a visible ring. Ease the bevel gradient
 	// out over the top of the shoulder with a smootherstep so the bend
 	// dissolves into the interior with no perceptible border.
+	// Starting at 0.3 (instead of 0.5) gives the fade more room so the
+	// refraction handoff to the liquid interior is imperceptible.
 	float bevelT = clamp(dC / max(zR, 1.0), 0.0, 1.0);
-	float junctionFade = 1.0 - sstep5(0.5, 1.0, bevelT);
+	float junctionFade = 1.0 - sstep5(0.3, 1.0, bevelT);
 
 	// ── Liquid interior ──
 	// The flat centre gets a gentle convex lens plus a pointer-following
@@ -294,8 +296,27 @@ void main() {
 	vec2 micro = flow * distortAmt * (10.0 * u_dpr) * pxToUV * refrStrength;
 
 	// ── Chromatic aberration ──
+	// In the bevel zone the surface normal is tilted, giving strong rainbow
+	// fringing that looks great. But where the bevel meets the flat interior
+	// N.xy drops to near-zero, creating a hard ring.
+	// Fix: blend from normal-driven CA (bevel) to a radially-outward phantom CA
+	// (flat interior) that decays smoothly toward the panel centre.
 	float caS = u_chroma * (18.0 * u_dpr) * (edge * 0.7 + 0.3) * 2.0 * refrStrength;
-	vec2 caD = N.xy * caS * pxToUV;
+
+	// Normalised outward-from-centre direction (matches N.xy direction convention).
+	vec2 radialOut = v_localPx / max(length(v_localPx), 0.5);
+
+	// bevelBlend: 0 inside the bevel, smoothly rises to 1 as we cross the
+	// bevel shoulder into the flat interior.
+	float bevelBlend = sstep5(0.5, 1.0, bevelT);
+
+	// Flat-interior amplitude: inherits chromatic strength but decays
+	// quadratically toward the panel centre so the tail is invisible there.
+	float caFlatAmp = u_chroma * (10.0 * u_dpr) * refrStrength
+	                * (1.0 - sstep5(0.35, 1.0, insideSmooth / max(maxD, 1.0)));
+
+	// Blend: bevel CA → flat CA across the shoulder transition.
+	vec2 caD = mix(N.xy * caS, radialOut * caFlatAmp, bevelBlend) * pxToUV;
 	vec2 sampleUV = v_screenUV + refr + micro;
 
 	vec3 sharpCol = vec3(
