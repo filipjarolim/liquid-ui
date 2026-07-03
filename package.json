@@ -1,0 +1,29 @@
+{
+	"name": "liquidglass-nextjs",
+	"version": "1.1.0",
+	"description": "An optimized liquid glass effect library and showcase built on Next.js.",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"postinstall": "patch-package",
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"html-to-image": "1.11.13",
+		"next": "16.2.9",
+		"react": "19.2.4",
+		"react-dom": "19.2.4"
+	},
+	"devDependencies": {
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"eslint": "^9",
+		"eslint-config-next": "16.2.9",
+		"patch-package": "^8.0.1",
+		"typescript": "^5.7.0"
+	}
+}
