@@ -344,6 +344,20 @@
 	transition: color 0.2s, background-color 0.2s, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Buttons and anchors inside nav items inherit all item styles */
+.nav-item > button,
+.nav-item > a {
+	all: unset;
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	width: 100%;
+	cursor: pointer;
+	color: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
 .nav-item:hover {
 	color: var(--text-primary);
 	background-color: var(--bg-tertiary);
@@ -356,14 +370,20 @@
 	font-weight: 600;
 }
 
+.nav-item.active {
+	position: relative;
+}
+
 .nav-item.active::before {
 	content: "";
-	display: block;
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
 	width: 2px;
 	height: 14px;
 	background: var(--accent-primary);
 	border-radius: 2px;
-	margin-right: 0.5rem;
 }
 
 .nav-badge {
@@ -393,6 +413,13 @@
 
 .component-header-left {
 	flex: 1;
+}
+
+.component-header-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-shrink: 0;
 }
 
 .component-breadcrumb {
@@ -886,6 +913,9 @@
 .accordion-row-panel { width: 100%; overflow: hidden; }
 
 .accordion-header {
+	all: unset;
+	box-sizing: border-box;
+	width: 100%;
 	padding: 1.1rem 1.35rem;
 	font-weight: 600;
 	font-size: 0.92rem;
@@ -912,7 +942,7 @@
 }
 
 .accordion-row-panel.open .accordion-content {
-	max-height: 160px;
+	max-height: 320px;
 	padding-bottom: 1.15rem;
 	opacity: 1;
 }
@@ -1316,7 +1346,7 @@
 	inset: 0;
 	background: rgba(0,0,0,0.55);
 	backdrop-filter: blur(4px);
-	z-index: 2000;
+	z-index: 2100;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1455,7 +1485,6 @@
 
 	.left-sidebar .sidebar-section:not(:last-child) { margin-bottom: 0; }
 	.left-sidebar .nav-group-title { display: none; }
-	.left-sidebar .sidebar-section:first-child { display: none; }
 	.left-sidebar .nav-list { flex-direction: row; margin-bottom: 0; gap: 0.4rem; }
 
 	.main-pane { padding: 1.5rem 1.25rem; }

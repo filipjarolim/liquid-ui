@@ -184,9 +184,9 @@ export class GlassPanel extends SSR_HTMLElement {
 
 	attributeChangedCallback() {
 		this.syncConfig();
-		// Notify parent container that config changed
+		// Only notify when already registered — avoids wasted work during initial attribute hydration.
 		const container = this.closest('glass-container') as GlassContainer;
-		if (container && container.instance) {
+		if (container?.instance?.glassSet?.has(this)) {
 			container.instance.markChanged(this);
 		}
 	}

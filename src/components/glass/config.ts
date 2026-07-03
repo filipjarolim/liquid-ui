@@ -31,15 +31,25 @@ export const HEADER_GLASS_CONFIG = {
 
 export const CONFIG_STORAGE_KEY = 'glass-ui-config-v2';
 
-export const GLASS_ROOT_IDS = ['glass-preview-root', 'glass-page-root'] as const;
+export const GLASS_ROOT_IDS = ['glass-preview-root', 'glass-page-root', 'glass-hero-btn'] as const;
 
 export function refreshAllGlass(): void {
+	// Refresh all known roots by ID, plus any other glass-container elements on the page.
+	const seen = new Set<HTMLElement>();
 	for (const id of GLASS_ROOT_IDS) {
 		const el = document.getElementById(id) as HTMLElement & {
 			instance?: { markChanged: (target?: HTMLElement) => void };
 		};
-		el?.instance?.markChanged();
+		if (el) {
+			seen.add(el);
+			el.instance?.markChanged();
+		}
 	}
+	// Catch any dynamically-created roots not in the static list.
+	document.querySelectorAll('glass-container').forEach((el) => {
+		const gc = el as HTMLElement & { instance?: { markChanged: (target?: HTMLElement) => void } };
+		if (!seen.has(gc)) gc.instance?.markChanged();
+	});
 }
 
 export function buildGlassProps(

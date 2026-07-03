@@ -131,35 +131,45 @@ const PROP_ROWS = [
 ];
 
 const MagneticButton = ({ children, className, style, mounted, ...props }: any) => {
-	const ref = useRef<any>(null);
+	// Use a wrapper span for the magnetic ref so getBoundingClientRect() is
+	// always available and doesn't conflict with the custom-element internals.
+	const wrapRef = useRef<HTMLSpanElement>(null);
 	const [transform, setTransform] = useState("translate3d(0px,0px,0px)");
 	const handleMouseMove = (e: React.MouseEvent) => {
-		if (!ref.current) return;
-		const r = ref.current.getBoundingClientRect();
+		if (!wrapRef.current) return;
+		const r = wrapRef.current.getBoundingClientRect();
 		const px = (e.clientX - r.left - r.width / 2) * 0.35;
 		const py = (e.clientY - r.top - r.height / 2) * 0.35;
 		setTransform(`translate3d(${px}px,${py}px,0) scale(1.05)`);
 	};
 	const handleMouseLeave = () => setTransform("translate3d(0px,0px,0px)");
 	const Tag = mounted ? "glass-button" : "button";
+	// Only pass glass-specific attrs when the custom element is mounted; native
+	// <button> would receive invalid DOM attributes and React would warn.
+	const glassProps = mounted ? props : {};
 	return (
-		<Tag ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}
-			style={{ ...style, transform, transition: transform === "translate3d(0px,0px,0px)" ? "transform 0.5s cubic-bezier(0.22,1,0.36,1)" : "transform 0.15s ease-out", display: "inline-flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
-			className={className} {...props}>
-			<span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-				<GlassContent inline>{children}</GlassContent>
-			</span>
-		</Tag>
+		<span ref={wrapRef} style={{ display: "inline-flex" }}
+			onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+			<Tag
+				style={{ ...style, transform, transition: transform === "translate3d(0px,0px,0px)" ? "transform 0.5s cubic-bezier(0.22,1,0.36,1)" : "transform 0.15s ease-out", display: "inline-flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+				className={className} {...glassProps}>
+				<span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+					<GlassContent inline>{children}</GlassContent>
+				</span>
+			</Tag>
+		</span>
 	);
 };
 
 function CopyButton({ text }: { text: string }) {
 	const [copied, setCopied] = useState(false);
+	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 	const copy = () => {
 		navigator.clipboard.writeText(text).then(() => {
 			setCopied(true);
-			setTimeout(() => setCopied(false), 1800);
-		});
+			timerRef.current = setTimeout(() => setCopied(false), 1800);
+		}).catch(() => {});
 	};
 	return (
 		<button type="button" className="copy-btn" onClick={copy} aria-label="Copy to clipboard">
@@ -282,7 +292,7 @@ export default function ShowcasePage() {
 				{/* ── Header ── */}
 				<GlassHeader
 					pgValues={fxValues}
-					logo={<><span className="logo-orb" /><span>LiquidGlass <span className="badge">v1.2</span></span></>}
+					logo={<><span className="logo-orb" /><span>LiquidGlass <span className="badge">v1.2.0</span></span></>}
 					navItems={[
 						{ label: "Home",       href: "#home",         onClick: (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); } },
 						{ label: "Docs",       href: "#installation", onClick: (e) => { e.preventDefault(); document.getElementById("installation")?.scrollIntoView({ behavior: "smooth" }); } },
@@ -321,10 +331,10 @@ export default function ShowcasePage() {
 						</p>
 						<div className="hero-cta-row">
 							{/* Wrap the glass button in a small GlassRoot so it has a capture surface */}
-							<GlassRoot id="glass-hero-btn" className="hero-btn-glass-root">
-								<ShowcaseGlassButton
-									pgValues={pgValues}
-									className="hero-btn-primary"
+						<GlassRoot id="glass-hero-btn" className="hero-btn-glass-root">
+							<ShowcaseGlassButton
+								pgValues={fxValues}
+								className="hero-btn-primary"
 									overrides={{ "corner-radius": 12, "shadow-opacity": 0.2 }}
 									onClick={() => document.getElementById("installation")?.scrollIntoView({ behavior: "smooth" })}
 								>
@@ -366,10 +376,10 @@ export default function ShowcasePage() {
 						<div className="sidebar-section">
 							<div className="nav-group-title">Getting Started</div>
 							<ul className="nav-list">
-								<li className="nav-item" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Introduction</li>
-								<li className="nav-item" onClick={() => document.getElementById("installation")?.scrollIntoView({ behavior: "smooth" })}>Installation</li>
-								<li className="nav-item" onClick={() => document.getElementById("usage")?.scrollIntoView({ behavior: "smooth" })}>Usage</li>
-								<li className="nav-item" onClick={() => document.getElementById("api")?.scrollIntoView({ behavior: "smooth" })}>API Reference</li>
+								<li className="nav-item"><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Introduction</button></li>
+								<li className="nav-item"><a href="#installation" onClick={(e) => { e.preventDefault(); document.getElementById("installation")?.scrollIntoView({ behavior: "smooth" }); }}>Installation</a></li>
+								<li className="nav-item"><a href="#usage" onClick={(e) => { e.preventDefault(); document.getElementById("usage")?.scrollIntoView({ behavior: "smooth" }); }}>Usage</a></li>
+								<li className="nav-item"><a href="#api" onClick={(e) => { e.preventDefault(); document.getElementById("api")?.scrollIntoView({ behavior: "smooth" }); }}>API Reference</a></li>
 							</ul>
 						</div>
 						<div className="sidebar-section">
@@ -377,10 +387,11 @@ export default function ShowcasePage() {
 							<ul className="nav-list">
 								{COMPONENTS.map((c) => (
 									<li key={c.id}
-										className={`nav-item ${currentComponent === c.id ? "active" : ""}`}
-										onClick={() => { setCurrentComponent(c.id); setPreviewTab("preview"); }}>
-										<span>{c.label}</span>
-										{c.badge && <span className="nav-badge">{c.badge}</span>}
+										className={`nav-item ${currentComponent === c.id ? "active" : ""}`}>
+										<button type="button" onClick={() => { setCurrentComponent(c.id); setPreviewTab("preview"); }}>
+											<span>{c.label}</span>
+											{c.badge && <span className="nav-badge">{c.badge}</span>}
+										</button>
 									</li>
 								))}
 							</ul>
@@ -388,13 +399,17 @@ export default function ShowcasePage() {
 						<div className="sidebar-section">
 							<div className="nav-group-title">More</div>
 							<ul className="nav-list">
-								<li className="nav-item nav-item-external" onClick={() => window.open("https://github.com/liquidglass-ui/liquidglass-ui", "_blank")}>
-									Changelog
-									<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.5 }}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+								<li className="nav-item nav-item-external">
+									<a href="https://github.com/filipjarolim/liquid-ui/releases" target="_blank" rel="noopener noreferrer">
+										Changelog
+										<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.5 }}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+									</a>
 								</li>
-								<li className="nav-item nav-item-external" onClick={() => window.open("https://github.com/liquidglass-ui/liquidglass-ui/issues", "_blank")}>
-									GitHub Issues
-									<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.5 }}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+								<li className="nav-item nav-item-external">
+									<a href="https://github.com/filipjarolim/liquid-ui/issues" target="_blank" rel="noopener noreferrer">
+										GitHub Issues
+										<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.5 }}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+									</a>
 								</li>
 							</ul>
 						</div>
@@ -443,10 +458,10 @@ export default function ShowcasePage() {
 													{ q: "How can I contact customer support?",  a: "Our support team is available 24/7 via live chat or email at support@glassui.dev." },
 												].map((item, idx) => (
 													<ShowcaseGlassPanel key={idx} className={`accordion-row-panel ${activeAccordion === idx ? "open" : ""}`} pgValues={fxValues}>
-														<div className="accordion-header" onClick={() => setActiveAccordion(activeAccordion === idx ? null : idx)}>
+														<button type="button" className="accordion-header" onClick={() => setActiveAccordion(activeAccordion === idx ? null : idx)} aria-expanded={activeAccordion === idx}>
 															<span>{item.q}</span>
 															<svg className="accordion-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
-														</div>
+														</button>
 														<div className="accordion-content">{item.a}</div>
 													</ShowcaseGlassPanel>
 												))}
@@ -662,17 +677,17 @@ export default function ShowcasePage() {
 							<span className="footer-brand-version">v1.2.0</span>
 						</div>
 						<div className="footer-links">
-							<div className="footer-col">
-								<div className="footer-col-title">Docs</div>
-								<a className="footer-link" onClick={() => document.getElementById("installation")?.scrollIntoView({ behavior: "smooth" })}>Installation</a>
-								<a className="footer-link" onClick={() => document.getElementById("usage")?.scrollIntoView({ behavior: "smooth" })}>Usage</a>
-								<a className="footer-link" onClick={() => document.getElementById("api")?.scrollIntoView({ behavior: "smooth" })}>API Reference</a>
-							</div>
-							<div className="footer-col">
-								<div className="footer-col-title">Components</div>
-								{COMPONENTS.slice(0, 4).map((c) => (
-									<a key={c.id} className="footer-link" onClick={() => { setCurrentComponent(c.id); document.getElementById("showcase")?.scrollIntoView({ behavior: "smooth" }); }}>{c.label}</a>
-								))}
+						<div className="footer-col">
+							<div className="footer-col-title">Docs</div>
+							<a className="footer-link" href="#installation" onClick={(e) => { e.preventDefault(); document.getElementById("installation")?.scrollIntoView({ behavior: "smooth" }); }}>Installation</a>
+							<a className="footer-link" href="#usage" onClick={(e) => { e.preventDefault(); document.getElementById("usage")?.scrollIntoView({ behavior: "smooth" }); }}>Usage</a>
+							<a className="footer-link" href="#api" onClick={(e) => { e.preventDefault(); document.getElementById("api")?.scrollIntoView({ behavior: "smooth" }); }}>API Reference</a>
+						</div>
+						<div className="footer-col">
+							<div className="footer-col-title">Components</div>
+							{COMPONENTS.slice(0, 4).map((c) => (
+								<a key={c.id} className="footer-link" href={`#${c.id}`} onClick={(e) => { e.preventDefault(); setCurrentComponent(c.id); document.getElementById("showcase")?.scrollIntoView({ behavior: "smooth" }); }}>{c.label}</a>
+							))}
 							</div>
 							<div className="footer-col">
 								<div className="footer-col-title">Resources</div>

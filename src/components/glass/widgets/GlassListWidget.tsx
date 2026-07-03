@@ -31,12 +31,12 @@ export function GlassListWidget({ pgValues, title, items }: GlassListWidgetProps
 				<span className="widget-list-count">{remaining}</span>
 			</div>
 			<ul className="widget-list-items">
-				{items.map((item, idx) => (
-					<li
-						key={item}
-						className={`widget-list-row${done.has(idx) ? ' done' : ''}`}
-						onClick={() => toggle(idx)}
-					>
+			{items.map((item, idx) => (
+				<li
+					key={idx}
+					className={`widget-list-row${done.has(idx) ? ' done' : ''}`}
+					onClick={() => toggle(idx)}
+				>
 						<span className="widget-list-circle" aria-hidden>
 							{done.has(idx) ? (
 								<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3">
