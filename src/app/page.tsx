@@ -38,11 +38,11 @@ const pgParams: PlaygroundParam[] = [
 
 const DEFAULT_CONFIG = { ...DEFAULT_GLASS_CONFIG };
 
-const KENDRICK_NOT_LIKE_US = {
-	title: "Not Like Us",
-	subtitle: "Kendrick Lamar",
-	artSrc: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/31/3a/3f/313a3fbc-bb8f-80c7-b5a2-e226869a38cd/24UMGIM51924.rgb.jpg/300x300bb.jpg",
-	audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b6/6b/8c/b66b8c42-8c82-242b-4ef1-3655d19ac1aa/mzaf_1950801191699299821.plus.aac.p.m4a",
+const DRAKE_LITTLE_BIRDIE = {
+	title: "Little Birdie",
+	subtitle: "Drake",
+	artSrc: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7f/39/61/7f396123-be56-bc11-eaab-976441808e58/26UMGIM63622.rgb.jpg/300x300bb.jpg",
+	audioSrc: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1d/89/dc/1d89dcf3-b67c-1381-23f9-65b81d213648/mzaf_4925677266435083316.plus.aac.p.m4a",
 };
 
 const COMPONENTS = [
@@ -536,7 +536,7 @@ export default function ShowcasePage() {
 										{currentComponent === "widgets" && (
 											<div className="widget-showcase">
 												<div className="widget-grid">
-													<GlassMusicWidget pgValues={fxValues} artSrc={KENDRICK_NOT_LIKE_US.artSrc} title={KENDRICK_NOT_LIKE_US.title} subtitle={KENDRICK_NOT_LIKE_US.subtitle} audioSrc={KENDRICK_NOT_LIKE_US.audioSrc} />
+													<GlassMusicWidget pgValues={fxValues} artSrc={DRAKE_LITTLE_BIRDIE.artSrc} title={DRAKE_LITTLE_BIRDIE.title} subtitle={DRAKE_LITTLE_BIRDIE.subtitle} audioSrc={DRAKE_LITTLE_BIRDIE.audioSrc} />
 													<GlassListWidget pgValues={fxValues} title="Reminders" items={["Buy groceries", "Water the Monstera", "Ship v1.3 🚀"]} />
 												</div>
 												<div className="app-icon-row">

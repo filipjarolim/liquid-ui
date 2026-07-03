@@ -16,6 +16,16 @@ export interface GlassMusicWidgetProps {
 	onPause?: () => void;
 }
 
+const FADE_IN_MS  = 900;   // ramp-up after pressing play
+const FADE_OUT_MS = 1800;  // ramp-down when approaching the end
+const FADE_PAUSE_MS = 350; // quick ramp-down when user presses pause
+const FADE_OUT_BEFORE_END_S = 3; // seconds before end to start fading out
+
+/** Smooth ease-in-out curve (quad). */
+function easeInOut(t: number): number {
+	return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
 /** Music widget — album art, track info, and a glass play/pause pill (iOS style). */
 export function GlassMusicWidget({
 	pgValues,
@@ -28,26 +38,75 @@ export function GlassMusicWidget({
 }: GlassMusicWidgetProps) {
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
+	const fadeRafRef = useRef<number | null>(null);
+	const fadingOutRef = useRef(false); // true while end-of-track fade is running
+
+	const cancelFade = () => {
+		if (fadeRafRef.current !== null) {
+			cancelAnimationFrame(fadeRafRef.current);
+			fadeRafRef.current = null;
+		}
+	};
+
+	/** Animate audio.volume from `from` → `to` over `duration` ms. */
+	const fadeVolume = useCallback(
+		(from: number, to: number, duration: number, onDone?: () => void) => {
+			cancelFade();
+			const startTime = performance.now();
+			const tick = (now: number) => {
+				const audio = audioRef.current;
+				if (!audio) { onDone?.(); return; }
+				const t = Math.min((now - startTime) / duration, 1);
+				audio.volume = Math.max(0, Math.min(1, from + (to - from) * easeInOut(t)));
+				if (t < 1) {
+					fadeRafRef.current = requestAnimationFrame(tick);
+				} else {
+					fadeRafRef.current = null;
+					onDone?.();
+				}
+			};
+			fadeRafRef.current = requestAnimationFrame(tick);
+		},
+		[],
+	);
 
 	useEffect(() => {
 		const audio = audioRef.current;
 		if (!audio) return;
 
 		const onPlayEvent = () => setIsPlaying(true);
-		const onPauseEvent = () => setIsPlaying(false);
-		const onEnded = () => setIsPlaying(false);
+		const onPauseEvent = () => { setIsPlaying(false); fadingOutRef.current = false; };
+		const onEnded = () => { setIsPlaying(false); fadingOutRef.current = false; };
+
+		const onTimeUpdate = () => {
+			if (!audio.duration || fadingOutRef.current || audio.paused) return;
+			const remaining = audio.duration - audio.currentTime;
+			if (remaining <= FADE_OUT_BEFORE_END_S) {
+				fadingOutRef.current = true;
+				const fadeDuration = Math.min(remaining * 1000, FADE_OUT_MS);
+				fadeVolume(audio.volume, 0, fadeDuration, () => {
+					audio.pause();
+					audio.currentTime = 0;
+					audio.volume = 1;
+					fadingOutRef.current = false;
+				});
+			}
+		};
 
 		audio.addEventListener('play', onPlayEvent);
 		audio.addEventListener('pause', onPauseEvent);
 		audio.addEventListener('ended', onEnded);
+		audio.addEventListener('timeupdate', onTimeUpdate);
 
 		return () => {
+			cancelFade();
 			audio.removeEventListener('play', onPlayEvent);
 			audio.removeEventListener('pause', onPauseEvent);
 			audio.removeEventListener('ended', onEnded);
+			audio.removeEventListener('timeupdate', onTimeUpdate);
 			audio.pause();
 		};
-	}, [audioSrc]);
+	}, [audioSrc, fadeVolume]);
 
 	const togglePlayback = useCallback(async () => {
 		if (!audioSrc || !audioRef.current) {
@@ -57,17 +116,30 @@ export function GlassMusicWidget({
 
 		const audio = audioRef.current;
 		if (audio.paused) {
+			// Reset any lingering fade state from previous play
+			cancelFade();
+			fadingOutRef.current = false;
+			audio.volume = 0;
 			try {
 				await audio.play();
+				fadeVolume(0, 1, FADE_IN_MS);
 				onPlay?.();
 			} catch {
 				setIsPlaying(false);
 			}
 		} else {
-			audio.pause();
+			// Fade out quickly, then pause
+			cancelFade();
+			fadingOutRef.current = false;
+			const fromVol = audio.volume;
+			fadeVolume(fromVol, 0, FADE_PAUSE_MS, () => {
+				audio.pause();
+				audio.currentTime = 0;
+				audio.volume = 1;
+			});
 			onPause?.();
 		}
-	}, [audioSrc, onPlay, onPause]);
+	}, [audioSrc, fadeVolume, onPlay, onPause]);
 
 	return (
 		<GlassWidget
