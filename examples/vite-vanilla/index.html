@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>LiquidGlass — Vanilla</title>
+		<link rel="stylesheet" href="/src/style.css" />
+	</head>
+	<body>
+		<glass-container class="page">
+			<section class="hero">
+				<h1>LiquidGlass — Vanilla HTML</h1>
+				<p>Custom elements from <code>liquidglass-ui/elements</code></p>
+			</section>
+			<glass-panel
+				blur-amount="0.62"
+				refraction="0.55"
+				class="panel"
+			>
+				<span>Hello from &lt;glass-panel&gt;</span>
+			</glass-panel>
+			<glass-button blur-amount="0.55" class="btn">Press me</glass-button>
+		</glass-container>
+		<script type="module" src="/src/main.ts"></script>
+	</body>
+</html>

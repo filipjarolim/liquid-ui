@@ -1,0 +1,44 @@
+@import "liquidglass-ui/styles/glass-theme.css";
+@import "liquidglass-ui/styles/glass-ui.css";
+
+:root {
+	color-scheme: dark;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	font-family: system-ui, sans-serif;
+	background: var(--glass-bg-base);
+	color: var(--glass-fg);
+}
+
+.page {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	padding: 2rem;
+	min-height: 100vh;
+}
+
+.hero h1 {
+	margin: 0 0 0.5rem;
+	font-size: 1.75rem;
+}
+
+.panel {
+	display: inline-flex;
+	padding: 1rem 1.5rem;
+	border-radius: 1rem;
+	max-width: 20rem;
+}
+
+.btn {
+	display: inline-flex;
+	padding: 0.75rem 1.25rem;
+	border-radius: 999px;
+	border: none;
+	cursor: pointer;
+	font: inherit;
+	color: inherit;
+}

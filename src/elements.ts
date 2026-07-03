@@ -47,6 +47,22 @@ function getConfigFromAttributes(el: HTMLElement): Partial<GlassConfig> {
 
 const SSR_HTMLElement = (typeof window !== 'undefined' ? HTMLElement : class {}) as typeof HTMLElement;
 
+/** Glass elements owned by this container — excludes panels inside nested glass-containers. */
+function getOwnedGlassElements(container: HTMLElement): HTMLElement[] {
+	const all = Array.from(
+		container.querySelectorAll('glass-panel, glass-button'),
+	) as HTMLElement[];
+	return all.filter((el) => {
+		let parent = el.parentElement;
+		while (parent) {
+			if (parent === container) return true;
+			if (parent.tagName === 'GLASS-CONTAINER') return false;
+			parent = parent.parentElement;
+		}
+		return false;
+	});
+}
+
 export class GlassContainer extends SSR_HTMLElement {
 	private _lgInstance: LiquidGlass | null = null;
 	private _observer: MutationObserver | null = null;
@@ -81,10 +97,7 @@ export class GlassContainer extends SSR_HTMLElement {
 		// Wait a tick for children to be parsed
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 
-		// Find initial glass elements in the entire subtree
-		const glassElements = Array.from(
-			this.querySelectorAll('glass-panel, glass-button')
-		) as HTMLElement[];
+		const glassElements = getOwnedGlassElements(this);
 
 		// Initialize LiquidGlass targeting this container
 		this._lgInstance = await LiquidGlass.init({
@@ -111,24 +124,24 @@ export class GlassContainer extends SSR_HTMLElement {
 
 			for (const mutation of mutations) {
 				mutation.addedNodes.forEach((node) => {
-					if (node instanceof HTMLElement) {
-						if (node.tagName === 'GLASS-PANEL' || node.tagName === 'GLASS-BUTTON') {
-							this._lgInstance!.registerElement(node);
+					if (!(node instanceof HTMLElement)) return;
+					const added = node.tagName === 'GLASS-PANEL' || node.tagName === 'GLASS-BUTTON'
+						? [node]
+						: Array.from(node.querySelectorAll('glass-panel, glass-button')) as HTMLElement[];
+					for (const el of added) {
+						if (getOwnedGlassElements(this).includes(el)) {
+							this._lgInstance!.registerElement(el);
 						}
-						// Also register any nested elements inside the added node
-						const nested = node.querySelectorAll('glass-panel, glass-button');
-						nested.forEach((el) => this._lgInstance!.registerElement(el as HTMLElement));
 					}
 				});
 
 				mutation.removedNodes.forEach((node) => {
-					if (node instanceof HTMLElement) {
-						if (node.tagName === 'GLASS-PANEL' || node.tagName === 'GLASS-BUTTON') {
-							this._lgInstance!.unregisterElement(node);
-						}
-						// Also unregister any nested elements inside the removed node
-						const nested = node.querySelectorAll('glass-panel, glass-button');
-						nested.forEach((el) => this._lgInstance!.unregisterElement(el as HTMLElement));
+					if (!(node instanceof HTMLElement)) return;
+					const removed = node.tagName === 'GLASS-PANEL' || node.tagName === 'GLASS-BUTTON'
+						? [node]
+						: Array.from(node.querySelectorAll('glass-panel, glass-button')) as HTMLElement[];
+					for (const el of removed) {
+						this._lgInstance!.unregisterElement(el);
 					}
 				});
 			}

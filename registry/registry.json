@@ -1,0 +1,142 @@
+{
+	"$schema": "./schema.json",
+	"name": "glassui",
+	"homepage": "https://github.com/liquidglass-ui/liquidglass-ui",
+	"items": [
+		{
+			"name": "utils",
+			"type": "registry:lib",
+			"description": "cn() utility for merging Tailwind classes",
+			"files": [{ "path": "lib/utils.ts", "type": "registry:lib" }],
+			"dependencies": ["clsx", "tailwind-merge"]
+		},
+		{
+			"name": "glass-config",
+			"type": "registry:lib",
+			"description": "Default glass shader config and buildGlassProps helpers",
+			"files": [{ "path": "components/glass/config.ts", "type": "registry:lib" }],
+			"registryDependencies": [],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-content",
+			"type": "registry:component",
+			"description": "Keeps text/icons above the WebGL canvas layer",
+			"files": [{ "path": "components/glass/GlassContent.tsx", "type": "registry:component" }],
+			"registryDependencies": []
+		},
+		{
+			"name": "use-glass-mount",
+			"type": "registry:hook",
+			"description": "SSR-safe hook — true after custom elements register",
+			"files": [{ "path": "components/glass/hooks/useGlassMount.ts", "type": "registry:hook" }],
+			"registryDependencies": []
+		},
+		{
+			"name": "glass-root",
+			"type": "registry:component",
+			"description": "glass-container wrapper for a capture context",
+			"files": [
+				{ "path": "components/glass/GlassRoot.tsx", "type": "registry:component" },
+				{ "path": "types/liquidglass.d.ts", "type": "registry:lib" }
+			],
+			"registryDependencies": ["use-glass-mount"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-chip",
+			"type": "registry:component",
+			"description": "Base glass panel/button primitive",
+			"files": [{ "path": "components/glass/GlassChip.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-config", "glass-content", "use-glass-mount"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-header",
+			"type": "registry:component",
+			"description": "Sticky header bar with logo, nav, search, and icon buttons",
+			"files": [
+				{ "path": "components/glass/header/GlassHeader.tsx", "type": "registry:component" },
+				{ "path": "components/glass/header/GlassHeaderLogo.tsx", "type": "registry:component" },
+				{ "path": "components/glass/header/GlassHeaderNav.tsx", "type": "registry:component" },
+				{ "path": "components/glass/header/GlassHeaderNavLink.tsx", "type": "registry:component" },
+				{ "path": "components/glass/header/GlassHeaderSearch.tsx", "type": "registry:component" },
+				{ "path": "components/glass/header/GlassHeaderIconButton.tsx", "type": "registry:component" }
+			],
+			"registryDependencies": ["glass-chip", "glass-config", "glass-content", "use-glass-mount"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-widget",
+			"type": "registry:component",
+			"description": "iOS home-screen style widget panel",
+			"files": [{ "path": "components/glass/widgets/GlassWidget.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-chip"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-music-widget",
+			"type": "registry:component",
+			"description": "Music widget with album art and glass play pill",
+			"files": [{ "path": "components/glass/widgets/GlassMusicWidget.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-widget", "glass-chip"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-list-widget",
+			"type": "registry:component",
+			"description": "Reminders-style checklist widget",
+			"files": [{ "path": "components/glass/widgets/GlassListWidget.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-widget"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-app-icon",
+			"type": "registry:component",
+			"description": "iOS squircle glass app icon",
+			"files": [{ "path": "components/glass/widgets/GlassAppIcon.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-chip"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-tab-bar",
+			"type": "registry:component",
+			"description": "Glass pill tab bar",
+			"files": [{ "path": "components/glass/showcase/GlassTabBar.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-chip"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-toggle",
+			"type": "registry:component",
+			"description": "Glass toggle switch",
+			"files": [{ "path": "components/glass/showcase/GlassToggle.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-chip"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-panel",
+			"type": "registry:component",
+			"description": "Showcase glass panel with customizer props",
+			"files": [{ "path": "components/glass/showcase/ShowcaseGlassPanel.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-chip"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "glass-button",
+			"type": "registry:component",
+			"description": "Showcase glass button with hover springs",
+			"files": [{ "path": "components/glass/showcase/ShowcaseGlassPanel.tsx", "type": "registry:component" }],
+			"registryDependencies": ["glass-chip"],
+			"dependencies": ["liquidglass-ui"]
+		},
+		{
+			"name": "vanilla-starter",
+			"type": "registry:example",
+			"description": "Framework-agnostic HTML starter (no React)",
+			"files": [{ "path": "vanilla/starter.html", "type": "registry:example" }],
+			"registryDependencies": [],
+			"dependencies": ["liquidglass-ui"]
+		}
+	]
+}

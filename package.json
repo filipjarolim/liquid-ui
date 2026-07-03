@@ -1,29 +1,95 @@
 {
-	"name": "liquidglass-nextjs",
-	"version": "1.1.0",
-	"description": "An optimized liquid glass effect library and showcase built on Next.js.",
+	"name": "liquidglass-ui",
+	"version": "1.2.0",
+	"description": "iOS-style liquid glass WebGL component library — works with React, Vue, Svelte, or vanilla HTML custom elements.",
 	"type": "module",
-	"private": true,
+	"license": "MIT",
+	"author": "GlassUI",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/liquidglass-ui/liquidglass-ui"
+	},
+	"keywords": [
+		"glass",
+		"liquid-glass",
+		"webgl",
+		"ios",
+		"custom-elements",
+		"tailwind",
+		"react",
+		"ui",
+		"components"
+	],
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"bin": {
+		"liquidglass-ui": "./cli/index.mjs"
+	},
+	"files": [
+		"dist",
+		"cli",
+		"registry",
+		"styles"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./elements": {
+			"types": "./dist/elements.d.ts",
+			"import": "./dist/elements.js"
+		},
+		"./react": {
+			"types": "./dist/react.d.ts",
+			"import": "./dist/react.js"
+		},
+		"./styles/glass-theme.css": "./styles/glass-theme.css",
+		"./styles/glass-ui.css": "./styles/glass-ui.css",
+		"./registry/registry.json": "./registry/registry.json"
+	},
 	"scripts": {
 		"postinstall": "patch-package",
+		"prepare": "npm run build:lib && node scripts/sync-registry.mjs",
 		"dev": "next dev",
-		"build": "next build",
+		"build": "npm run build:lib && next build",
+		"build:lib": "tsup",
+		"sync:registry": "node scripts/sync-registry.mjs",
+		"verify:package": "node scripts/verify-package.mjs",
+		"test:cli": "node cli/index.mjs list && node scripts/verify-package.mjs",
+		"test:cli:e2e": "node scripts/test-cli-e2e.mjs",
+		"pack:check": "npm run verify:package && npm pack --dry-run",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"prepublishOnly": "npm run build:lib && npm run sync:registry && npm run verify:package"
 	},
 	"dependencies": {
-		"html-to-image": "1.11.13",
-		"next": "16.2.9",
-		"react": "19.2.4",
-		"react-dom": "19.2.4"
+		"html-to-image": "1.11.13"
+	},
+	"peerDependencies": {
+		"react": ">=18",
+		"react-dom": ">=18"
+	},
+	"peerDependenciesMeta": {
+		"react": { "optional": true },
+		"react-dom": { "optional": true }
 	},
 	"devDependencies": {
+		"@tailwindcss/postcss": "^4.1.8",
 		"@types/node": "^20",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
+		"clsx": "^2.1.1",
 		"eslint": "^9",
 		"eslint-config-next": "16.2.9",
+		"next": "16.2.9",
 		"patch-package": "^8.0.1",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"tailwind-merge": "^3.3.1",
+		"tailwindcss": "^4.1.8",
+		"tsup": "^8.5.0",
 		"typescript": "^5.7.0"
 	}
 }

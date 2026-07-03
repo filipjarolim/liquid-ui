@@ -1,0 +1,39 @@
+/**
+ * GlassUI design tokens — CSS variables for theming.
+ * Import before glass-ui.css. Override any token in your own CSS.
+ */
+:root,
+[data-theme='dark'] {
+	--glass-background: #0b0c10;
+	--glass-background-secondary: #14161c;
+	--glass-background-tertiary: #1c1f28;
+	--glass-foreground: #f4f4f5;
+	--glass-foreground-muted: #a1a1aa;
+	--glass-foreground-subtle: #71717a;
+	--glass-border: rgba(255, 255, 255, 0.08);
+	--glass-accent: #6366f1;
+	--glass-accent-secondary: #14b8a6;
+	--glass-glow: rgba(99, 102, 241, 0.15);
+	--glass-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--glass-chrome-height: 4rem;
+	--glass-radius-sm: 0.75rem;
+	--glass-radius-md: 1.25rem;
+	--glass-radius-lg: 2rem;
+	--glass-radius-full: 9999px;
+	--glass-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--glass-blur-default: 0.62;
+	--glass-tint-default: 0.55;
+	--glass-refraction-default: 0.6;
+}
+
+[data-theme='light'] {
+	--glass-background: #f8f9fc;
+	--glass-background-secondary: #ffffff;
+	--glass-background-tertiary: #eef0f6;
+	--glass-foreground: #18181b;
+	--glass-foreground-muted: #52525b;
+	--glass-foreground-subtle: #71717a;
+	--glass-border: rgba(0, 0, 0, 0.08);
+	--glass-glow: rgba(99, 102, 241, 0.12);
+	--glass-text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55);
+}

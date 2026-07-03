@@ -24,3 +24,6 @@ export { DEFAULTS } from './defaults';
 export type { GlassConfig } from './defaults';
 export { invalidateFontEmbedCache } from './HtmlCapture';
 export { GlassContainer, GlassPanel, GlassButton } from './elements';
+
+// Side-effect: register custom elements when importing the main entry.
+import './elements';

@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "liquidglass-ui": ["./dist/index.d.ts"],
+      "liquidglass-ui/elements": ["./dist/elements.d.ts"],
+      "liquidglass-ui/react": ["./dist/react.d.ts"]
     }
   },
   "include": [
@@ -30,5 +33,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "examples", "dist", "registry"]
 }

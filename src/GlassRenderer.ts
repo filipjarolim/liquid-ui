@@ -114,7 +114,8 @@ export class GlassRenderer {
 			'u_edgeHL', 'u_spec', 'u_fresnel', 'u_distort', 'u_alpha',
 			'u_sat', 'u_tint', 'u_zRadius', 'u_brightness',
 			'u_shadowAlpha', 'u_shadowSpread', 'u_shadowOffY',
-			'u_bevelMode', 'u_blurAmount', 'u_dpr', 'u_hasBg'
+			'u_bevelMode', 'u_blurAmount', 'u_dpr', 'u_hasBg', 'u_themeLift',
+			'u_time', 'u_hover', 'u_press', 'u_mouse'
 		]);
 	}
 
@@ -206,6 +207,8 @@ export class GlassRenderer {
 		height: number,
 		dpr: number,
 		hasBg = true,
+		themeLift = 0,
+		anim?: { time: number; hover: number; press: number; mouseX: number; mouseY: number },
 	): void {
 		if (this.contextLost) return;
 		if (!hasBg) {
@@ -253,6 +256,11 @@ export class GlassRenderer {
 		gl.uniform1f(this.glassU.u_blurAmount, config.blurAmount);
 		gl.uniform1f(this.glassU.u_dpr, dpr);
 		gl.uniform1f(this.glassU.u_hasBg, hasBg ? 1.0 : 0.0);
+		gl.uniform1f(this.glassU.u_themeLift, themeLift);
+		gl.uniform1f(this.glassU.u_time, anim ? anim.time : 0.0);
+		gl.uniform1f(this.glassU.u_hover, anim ? anim.hover : 0.0);
+		gl.uniform1f(this.glassU.u_press, anim ? anim.press : 0.0);
+		gl.uniform2f(this.glassU.u_mouse, anim ? anim.mouseX : 0.0, anim ? anim.mouseY : 0.0);
 
 		this._drawQuad(this.glassP, this.panelBuf);
 		gl.disable(gl.BLEND);

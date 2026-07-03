@@ -1,0 +1,20 @@
+{
+	"$schema": "https://liquidglass-ui.dev/schema.json",
+	"style": "default",
+	"framework": "next",
+	"rsc": true,
+	"tsx": true,
+	"tailwind": {
+		"config": "",
+		"css": "src/app/globals.css",
+		"baseColor": "neutral",
+		"cssVariables": true
+	},
+	"aliases": {
+		"components": "@/components",
+		"utils": "@/lib/utils",
+		"glass": "@/components/glass",
+		"lib": "@/lib",
+		"hooks": "@/hooks"
+	}
+}

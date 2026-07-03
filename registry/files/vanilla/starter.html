@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>GlassUI — Vanilla Starter</title>
+	<link rel="stylesheet" href="../../styles/glass-theme.css" />
+	<link rel="stylesheet" href="../../styles/glass-ui.css" />
+	<style>
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: system-ui, sans-serif;
+			background: var(--glass-background);
+			color: var(--glass-foreground);
+		}
+		.hero {
+			position: fixed;
+			inset: 0;
+			background: url('/background-3.avif') center/cover;
+			z-index: 0;
+		}
+		glass-container {
+			position: relative;
+			z-index: 1;
+			padding: 2rem;
+			min-height: 100vh;
+		}
+		.row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+		glass-panel { padding: 1.25rem 1.5rem; }
+		glass-button { padding: 0.6rem 1.4rem; cursor: pointer; }
+	</style>
+</head>
+<body>
+	<img class="hero" src="/background-3.avif" alt="" aria-hidden />
+	<glass-container id="app">
+		<glass-panel blur-amount="0.62" refraction="0.6" corner-radius="28" tint="0.55">
+			<h1 style="margin:0 0 0.5rem">GlassUI</h1>
+			<p style="margin:0;opacity:0.8">Framework-agnostic liquid glass via custom elements.</p>
+		</glass-panel>
+		<div class="row">
+			<glass-button button blur-amount="0.62" refraction="0.6" corner-radius="99" tint="0.55">
+				Get Started
+			</glass-button>
+			<glass-panel blur-amount="0.55" refraction="0.5" corner-radius="22" tint="0.5" style="padding:1rem 1.25rem">
+				Widget content
+			</glass-panel>
+		</div>
+	</glass-container>
+	<script type="module">
+		import 'liquidglass-ui/elements';
+	</script>
+</body>
+</html>

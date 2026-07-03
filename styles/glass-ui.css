@@ -1,0 +1,92 @@
+/**
+ * GlassUI Tailwind v4 integration.
+ *
+ * In your global CSS:
+ *   @import "tailwindcss";
+ *   @import "liquidglass-ui/styles/glass-theme.css";
+ *   @import "liquidglass-ui/styles/glass-ui.css";
+ */
+@import "./glass-theme.css";
+
+@theme inline {
+	--color-glass-bg: var(--glass-background);
+	--color-glass-bg-secondary: var(--glass-background-secondary);
+	--color-glass-bg-tertiary: var(--glass-background-tertiary);
+	--color-glass-fg: var(--glass-foreground);
+	--color-glass-fg-muted: var(--glass-foreground-muted);
+	--color-glass-fg-subtle: var(--glass-foreground-subtle);
+	--color-glass-border: var(--glass-border);
+	--color-glass-accent: var(--glass-accent);
+	--color-glass-accent-secondary: var(--glass-accent-secondary);
+	--radius-glass-sm: var(--glass-radius-sm);
+	--radius-glass-md: var(--glass-radius-md);
+	--radius-glass-lg: var(--glass-radius-lg);
+	--radius-glass-full: var(--glass-radius-full);
+	--ease-glass: var(--glass-ease);
+}
+
+/* ── Custom elements (framework-agnostic) ── */
+glass-container {
+	display: block;
+	position: relative;
+	width: 100%;
+}
+
+glass-panel,
+glass-button {
+	display: inline-block;
+	position: relative;
+	border: none;
+	color: var(--glass-foreground);
+	isolation: isolate;
+}
+
+glass-panel {
+	display: block;
+}
+
+glass-panel > canvas[data-lg-canvas],
+glass-button > canvas[data-lg-canvas] {
+	z-index: 0 !important;
+}
+
+.glass-content-layer {
+	position: relative;
+	z-index: 2;
+	color: inherit;
+}
+
+/* ── Tailwind utility aliases ── */
+@utility glass-surface {
+	background-color: color-mix(in srgb, var(--glass-background-secondary) 40%, transparent);
+	color: var(--glass-fg);
+}
+
+@utility glass-text {
+	color: var(--glass-fg);
+	text-shadow: var(--glass-text-shadow);
+}
+
+@utility glass-muted {
+	color: var(--glass-fg-muted);
+}
+
+@utility glass-chip {
+	border-radius: var(--radius-glass-full);
+}
+
+@utility glass-panel-base {
+	border-radius: var(--radius-glass-md);
+}
+
+@utility glass-transition {
+	transition-property: color, background-color, border-color, transform, opacity;
+	transition-duration: 350ms;
+	transition-timing-function: var(--ease-glass);
+}
+
+/* Capture mode — hide glass during background rasterization */
+[style*='--is-capturing'] glass-panel,
+[style*='--is-capturing'] glass-button {
+	opacity: 0 !important;
+}

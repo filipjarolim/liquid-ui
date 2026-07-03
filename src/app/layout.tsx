@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import LiquidGlassInitializer from "./LiquidGlassInitializer";
+import { GlassProvider } from "@/lib/glass-provider";
 
 const outfit = Outfit({
 	subsets: ["latin"],
@@ -20,6 +20,15 @@ export const metadata: Metadata = {
 	description: "An optimized liquid glass effect library for the web, packaged as Custom Elements. Apply realistic glass refraction, blur, and lighting using WebGL2.",
 };
 
+const themeInitScript = `
+try {
+  var t = localStorage.getItem('glass-ui-theme');
+  if (t === 'light' || t === 'dark') {
+    document.documentElement.setAttribute('data-theme', t);
+  }
+} catch (e) {}
+`;
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -28,12 +37,14 @@ export default function RootLayout({
 	return (
 		<html
 			lang="en"
-			className={`${outfit.variable} ${jetbrainsMono.variable} h-full antialiased`}
+			className={`${outfit.variable} ${jetbrainsMono.variable}`}
 			suppressHydrationWarning
 		>
-			<body className="min-h-full flex flex-col">
-				<LiquidGlassInitializer />
-				{children}
+			<head>
+				<script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+			</head>
+			<body>
+				<GlassProvider>{children}</GlassProvider>
 			</body>
 		</html>
 	);

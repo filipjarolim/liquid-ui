@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import "liquidglass-ui/styles/glass-theme.css";
+@import "liquidglass-ui/styles/glass-ui.css";
+
+html,
+body,
+#root {
+	min-height: 100%;
+	margin: 0;
+}
+
+body {
+	font-family: system-ui, sans-serif;
+	background: var(--glass-bg-base);
+	color: var(--glass-fg);
+}
